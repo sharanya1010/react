@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>useMemo Explained</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f172a, #020617);
+      color: #e5e7eb;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    header {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      animation: fadeIn 1.2s ease-out;
+      gap: 1.5rem;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(to right, #38bdf8, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      max-width: 700px;
+      font-size: 1.2rem;
+      color: #cbd5f5;
+    }
+
+    /* SHINY BUTTON */
+    .shine-btn {
+      position: relative;
+      padding: 14px 34px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(120deg, #38bdf8, #a78bfa, #38bdf8);
+      background-size: 200%;
+      transition: all 0.4s ease;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(167,139,250,0.5);
+    }
+
+    .shine-btn:hover {
+      background-position: right;
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 10px 40px rgba(56,189,248,0.7);
+    }
+
+    .shine-btn::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 50%;
+      height: 200%;
+      background: rgba(255,255,255,0.4);
+      transform: rotate(25deg);
+      transition: 0.7s;
+    }
+
+    .shine-btn:hover::after {
+      left: 130%;
+    }
+
+    section {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 0.8s ease;
+    }
+
+    section.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    section h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #f8fafc;
+    }
+
+    section p {
+      color: #c7d2fe;
+      margin-bottom: 1.5rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    code {
+      display: block;
+      background: #020617;
+      padding: 1rem;
+      border-radius: 12px;
+      color: #38bdf8;
+      font-size: 0.9rem;
+      overflow-x: auto;
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Understanding useMemo</h1>
+    <p>
+      Learn how <strong>useMemo</strong> optimizes performance in React by
+      preventing unnecessary recalculations — explained visually with smooth animations.
+    </p>
+
+    <!-- Scroll Button -->
+    <button class="shine-btn" onclick="scrollToNext()">
+      Start Learning ↓
+    </button>
+  </header>
+
+  <section id="next-section">
+    <div class="card">
+      <h2>What is useMemo?</h2>
+      <p>
+        <strong>useMemo</strong> is a React Hook that memorizes the result of a calculation.
+        Instead of recalculating on every render, React reuses the cached value until its dependencies change.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <h2>Why do we need it?</h2>
+      <p>
+        Every time a component re-renders, all the code inside it runs again.
+        If you have an expensive calculation, this can slow down your app.
+      </p>
+      <p>
+        <strong>useMemo</strong> solves this by running the calculation only when required.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <h2>Syntax</h2>
+      <code>
+const memoizedValue = useMemo(() => {
+  return calculation;
+}, [dependencies]);
+      </code>
+      <p>
+        The value is cached until one of the dependencies changes.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <h2>Real World Example</h2>
+      <p>
+        Without <strong>useMemo</strong>, a heavy function runs on every render — even when typing in an input.
+      </p>
+      <p>
+        With <strong>useMemo</strong>, the calculation runs only when its dependency (like <code>count</code>) changes.
+      </p>
+    </div>
+  </section>
+
+  <!-- VS CODE / FOLDER SECTION -->
+  <section>
+    <div class="card" style="text-align:center">
+      <h2>Try It Yourself 🚀</h2>
+      <p>
+        Click the button below to open your project folder or VS Code and start writing your own useMemo example.
+      </p>
+
+      <!-- IMPORTANT: Replace path with your folder -->
+      <button class="shine-btn" onclick="openFolder()">
+        Open Project Folder
+      </button>
+    </div>
+  </section>
+
+  <footer>
+    Built to make React performance concepts easy 🚀
+  </footer>
+
+  <script>
+    const sections = document.querySelectorAll('section');
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('show');
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    sections.forEach(section => observer.observe(section));
+
+    function scrollToNext() {
+      document.getElementById("next-section").scrollIntoView({
+        behavior: "smooth"
+      });
+    }
+
+    function openFolder() {
+      // This uses the VS Code protocol.
+      // IMPORTANT: Replace the path below with your project path.
+      // Example format: vscode://file/C:/Users/YourName/Desktop/YourProject
+
+      window.location.href = "vscode://file/C:/Users/Sharon/Desktop/React project";
+      
+    }
+  </script>
+
+</body>
+</html>
